@@ -26,8 +26,10 @@ public class Bird extends Game {
         manager.load("pipe_down.png", Texture.class);
         manager.load("background.png", Texture.class);
         manager.load("flappy_death.png", Texture.class);
-        manager.load("flap.wav", Sound.class);
-        manager.load("fail.wav", Sound.class);
+        manager.load("flap_v2.mp3", Sound.class);
+        manager.load("fail_v2.mp3", Sound.class);
+        manager.load("start_game.mp3", Sound.class);
+        manager.load("level_up.mp3", Sound.class);
         manager.finishLoading();
 
         batch = new SpriteBatch();

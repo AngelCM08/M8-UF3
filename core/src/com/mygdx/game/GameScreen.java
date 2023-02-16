@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import java.util.Iterator;
 
 public class GameScreen implements Screen {
@@ -21,10 +20,13 @@ public class GameScreen implements Screen {
     boolean dead;
     Array<Pipe> obstacles;
     long lastObstacleTime;
-    float score;
+    int score;
+    long timeBetweenPipe;
+    int speedy = 400;
 
     public GameScreen(final Bird gam) {
         score = 0;
+        timeBetweenPipe = 3500000000L;
         this.game = gam;
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -37,8 +39,9 @@ public class GameScreen implements Screen {
         stage.addActor(player);
 
         // create the obstacles array and spawn the first obstacle
-        obstacles = new Array<Pipe>();
+        obstacles = new Array<>();
         spawnObstacle();
+        game.manager.get("start_game.mp3", Sound.class).play();
     }
 
     private void spawnObstacle() {
@@ -87,8 +90,8 @@ public class GameScreen implements Screen {
 
         // process user input
         if (Gdx.input.justTouched()) {
-            player.impulso();
-            game.manager.get("flap.wav", Sound.class).play();
+            player.impulso(speedy);
+            game.manager.get("flap_v2.mp3", Sound.class).play();
         }
         stage.act();
 
@@ -96,12 +99,12 @@ public class GameScreen implements Screen {
         // Si surt per la part inferior, game over
         if (player.getBounds().y > 480 - 45)
             player.setY( 480 - 45 );
-        if (player.getBounds().y < 0 - 45) {
+        if (player.getBounds().y < -45) {
             dead = true;
         }
 
         // Comprova si cal generar un obstacle nou
-        if (TimeUtils.nanoTime() - lastObstacleTime > 1500000000) spawnObstacle();
+        if (TimeUtils.nanoTime() - lastObstacleTime > timeBetweenPipe) spawnObstacle();
 
         // Comprova si les tuberies colisionen amb el jugador
         Iterator<Pipe> iter = obstacles.iterator();
@@ -118,6 +121,11 @@ public class GameScreen implements Screen {
             Pipe pipe = iter.next();
             if(player.getX() > pipe.getX() && pipe.upsideDown && !pipe.superado){
                 score += 1;
+                if(score % 5 == 0) {
+                    game.manager.get("level_up.mp3", Sound.class).play();
+                    timeBetweenPipe -= 300000000L;
+                    speedy -= 30;
+                }
                 pipe.superado = true;
             }
             if (pipe.getX() < -64) {
@@ -128,7 +136,7 @@ public class GameScreen implements Screen {
         //score += Gdx.graphics.getDeltaTime();
 
         if(dead) {
-            game.manager.get("fail.wav", Sound.class).play();
+            game.manager.get("fail_v2.mp3", Sound.class).play();
             game.lastScore = (int)score;
             if(game.lastScore > game.topScore) game.topScore = game.lastScore;
             game.setScreen(new GameOverScreen(game));
