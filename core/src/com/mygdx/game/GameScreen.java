@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,7 +14,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import java.util.Iterator;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, InputProcessor {
     final Bird game;
     OrthographicCamera camera;
     Stage stage;
@@ -38,6 +40,13 @@ public class GameScreen implements Screen {
         stage.getViewport().setCamera(camera);
         stage.addActor(player);
 
+        // create pause button
+        /*PauseButton pauseButton = new PauseButton();
+        pauseButton.setX(480);
+        pauseButton.setY(480);
+        pauseButton.setManager(game.manager);
+        stage.addActor(pauseButton);*/
+
         // create the obstacles array and spawn the first obstacle
         obstacles = new Array<>();
         spawnObstacle();
@@ -55,6 +64,7 @@ public class GameScreen implements Screen {
         pipe1.setManager(game.manager);
         obstacles.add(pipe1);
         stage.addActor(pipe1);
+
         Pipe pipe2 = new Pipe();
         pipe2.setX(800);
         pipe2.setY(holey + 200);
@@ -160,5 +170,45 @@ public class GameScreen implements Screen {
     }
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
     }
 }
