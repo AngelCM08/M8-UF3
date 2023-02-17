@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
@@ -25,6 +24,7 @@ public class GameScreen implements Screen, InputProcessor {
     int score;
     long timeBetweenPipe;
     int speedy = 400;
+    int probability_movil_pipe = 50;
 
     public GameScreen(final Bird gam) {
         score = 0;
@@ -40,13 +40,6 @@ public class GameScreen implements Screen, InputProcessor {
         stage.getViewport().setCamera(camera);
         stage.addActor(player);
 
-        // create pause button
-        /*PauseButton pauseButton = new PauseButton();
-        pauseButton.setX(480);
-        pauseButton.setY(480);
-        pauseButton.setManager(game.manager);
-        stage.addActor(pauseButton);*/
-
         // create the obstacles array and spawn the first obstacle
         obstacles = new Array<>();
         spawnObstacle();
@@ -57,18 +50,18 @@ public class GameScreen implements Screen, InputProcessor {
         // Calcula la alçada de l'obstacle aleatòriament
         float holey = MathUtils.random(50, 230);
         // Crea dos obstacles: Una tubería superior i una inferior
-        Pipe pipe1 = new Pipe();
+        Pipe pipe1 = new Pipe(probability_movil_pipe);
         pipe1.setX(800);
         pipe1.setY(holey - 230);
-        pipe1.setUpsideDown(true);
+        pipe1.setStraight(true);
         pipe1.setManager(game.manager);
         obstacles.add(pipe1);
         stage.addActor(pipe1);
 
-        Pipe pipe2 = new Pipe();
+        Pipe pipe2 = new Pipe(probability_movil_pipe);
         pipe2.setX(800);
-        pipe2.setY(holey + 200);
-        pipe2.setUpsideDown(false);
+        pipe2.setY(holey + 230);
+        pipe2.setStraight(false);
         pipe2.setManager(game.manager);
         obstacles.add(pipe2);
         stage.addActor(pipe2);
@@ -129,12 +122,13 @@ public class GameScreen implements Screen, InputProcessor {
         iter = obstacles.iterator();
         while (iter.hasNext()) {
             Pipe pipe = iter.next();
-            if(player.getX() > pipe.getX() && pipe.upsideDown && !pipe.superado){
+            if(player.getX() > pipe.getX() && pipe.straight && !pipe.superado){
                 score += 1;
                 if(score % 5 == 0) {
                     game.manager.get("level_up.mp3", Sound.class).play();
                     timeBetweenPipe -= 300000000L;
-                    speedy -= 30;
+                    speedy -= 20;
+                    probability_movil_pipe -= 5;
                 }
                 pipe.superado = true;
             }
