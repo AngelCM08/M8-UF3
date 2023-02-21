@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import java.util.Iterator;
+import java.util.Random;
 
 public class GameScreen implements Screen, InputProcessor {
     final Bird game;
@@ -19,12 +20,15 @@ public class GameScreen implements Screen, InputProcessor {
     Stage stage;
     Player player;
     boolean dead;
-    Array<Pipe> obstacles;
+    Array<Pipe> pipes;
+    Array<Rocket> rockets;
     long lastObstacleTime;
     int score;
     long timeBetweenPipe;
     int speedy = 400;
-    int probability_movil_pipe = 50;
+    int probability_movil_pipe = 30;
+    int probability_rocket = 50;
+    Random rd = new Random();
 
     public GameScreen(final Bird gam) {
         score = 0;
@@ -41,7 +45,8 @@ public class GameScreen implements Screen, InputProcessor {
         stage.addActor(player);
 
         // create the obstacles array and spawn the first obstacle
-        obstacles = new Array<>();
+        pipes = new Array<>();
+        rockets = new Array<>();
         spawnObstacle();
         game.manager.get("start_game.mp3", Sound.class).play();
     }
@@ -55,7 +60,7 @@ public class GameScreen implements Screen, InputProcessor {
         pipe1.setY(holey - 230);
         pipe1.setStraight(true);
         pipe1.setManager(game.manager);
-        obstacles.add(pipe1);
+        pipes.add(pipe1);
         stage.addActor(pipe1);
 
         Pipe pipe2 = new Pipe(probability_movil_pipe);
@@ -63,8 +68,16 @@ public class GameScreen implements Screen, InputProcessor {
         pipe2.setY(holey + 230);
         pipe2.setStraight(false);
         pipe2.setManager(game.manager);
-        obstacles.add(pipe2);
+        pipes.add(pipe2);
         stage.addActor(pipe2);
+
+        Rocket rocket = new Rocket();
+        rocket.setManager(game.manager);
+        rocket.setX(800);
+        rocket.setY(rd.nextFloat()*300+100);
+        rockets.add(rocket);
+        stage.addActor(rocket);
+
         lastObstacleTime = TimeUtils.nanoTime();
     }
 
@@ -110,7 +123,7 @@ public class GameScreen implements Screen, InputProcessor {
         if (TimeUtils.nanoTime() - lastObstacleTime > timeBetweenPipe) spawnObstacle();
 
         // Comprova si les tuberies colisionen amb el jugador
-        Iterator<Pipe> iter = obstacles.iterator();
+        Iterator<Pipe> iter = pipes.iterator();
         while (iter.hasNext()) {
             Pipe pipe = iter.next();
             if (pipe.getBounds().overlaps(player.getBounds())) {
@@ -119,7 +132,7 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         // Treure de l'array les tuberies que estan fora de pantalla
-        iter = obstacles.iterator();
+        iter = pipes.iterator();
         while (iter.hasNext()) {
             Pipe pipe = iter.next();
             if(player.getX() > pipe.getX() && pipe.straight && !pipe.superado){
@@ -128,14 +141,51 @@ public class GameScreen implements Screen, InputProcessor {
                     game.manager.get("level_up.mp3", Sound.class).play();
                     timeBetweenPipe -= 300000000L;
                     speedy -= 20;
-                    probability_movil_pipe -= 5;
+                    if((probability_movil_pipe-3) >= 0){
+                        probability_movil_pipe -= 3;
+                    }
+
+
                 }
                 pipe.superado = true;
             }
             if (pipe.getX() < -64) {
-                obstacles.removeValue(pipe, true);
+                pipes.removeValue(pipe, true);
             }
         }
+
+        // Comprova si els cohets colisionen amb el jugador
+        Iterator<Rocket> rocketIterator = rockets.iterator();
+        while (rocketIterator.hasNext()) {
+            Rocket rocket = rocketIterator.next();
+            if (rocket.getBounds().overlaps(player.getBounds())) {
+                dead = true;
+            }
+        }
+
+        // Treure de l'array els cohets que estan fora de pantalla
+        rocketIterator = rockets.iterator();
+        while (iter.hasNext()) {
+            Rocket rocket = rocketIterator.next();
+            if(player.getX() > rocket.getX() && !rocket.superado){
+                score += 1;
+                if(score % 5 == 0) {
+                    game.manager.get("level_up.mp3", Sound.class).play();
+                    timeBetweenPipe -= 300000000L;
+                    speedy -= 20;
+                    if((probability_movil_pipe-3) >= 0){
+                        probability_movil_pipe -= 3;
+                    }
+
+
+                }
+                rocket.superado = true;
+            }
+            if (rocket.getX() < -48) {
+                rockets.removeValue(rocket, true);
+            }
+        }
+
         //La puntuació augmenta amb el temps de joc
         //score += Gdx.graphics.getDeltaTime();
 

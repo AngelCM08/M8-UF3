@@ -30,7 +30,7 @@ public class Pipe extends Actor {
         if(movil){
             if(moving_up){
                 moveBy(0, 100 * delta);
-                if(straight && this.bounds.y >= -30){
+                if(straight && this.bounds.y >= -80){
                     moving_up = false;
                 }else if(!straight && this.bounds.y >= 450){
                     moving_up = false;
