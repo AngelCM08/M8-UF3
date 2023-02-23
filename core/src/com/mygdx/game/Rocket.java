@@ -15,12 +15,12 @@ public class Rocket extends Actor {
     int speed;
     boolean superado;
 
-    Rocket() {
+    Rocket(int min) {
         setSize(64, 40);
         bounds = new Rectangle();
         setVisible(true);
         superado = false;
-        speed = rd.nextInt(100) + 250;
+        speed = rd.nextInt(100) + min;
     }
     @Override
     public void act(float delta) {

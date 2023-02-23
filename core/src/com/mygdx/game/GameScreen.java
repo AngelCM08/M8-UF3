@@ -27,7 +27,7 @@ public class GameScreen implements Screen, InputProcessor {
     long timeBetweenPipe;
     int speedy = 400;
     int probability_movil_pipe = 30;
-    int probability_rocket = 50;
+    int min = 250;
     Random rd = new Random();
 
     public GameScreen(final Bird gam) {
@@ -71,7 +71,7 @@ public class GameScreen implements Screen, InputProcessor {
         pipes.add(pipe2);
         stage.addActor(pipe2);
 
-        Rocket rocket = new Rocket();
+        Rocket rocket = new Rocket(min);
         rocket.setManager(game.manager);
         rocket.setX(800);
         rocket.setY(rd.nextFloat()*300+100);
@@ -141,11 +141,10 @@ public class GameScreen implements Screen, InputProcessor {
                     game.manager.get("level_up.mp3", Sound.class).play();
                     timeBetweenPipe -= 300000000L;
                     speedy -= 20;
-                    if((probability_movil_pipe-3) >= 0){
+                    min += 50;
+                    if((probability_movil_pipe-3) > 0){
                         probability_movil_pipe -= 3;
                     }
-
-
                 }
                 pipe.superado = true;
             }
@@ -176,8 +175,6 @@ public class GameScreen implements Screen, InputProcessor {
                     if((probability_movil_pipe-3) >= 0){
                         probability_movil_pipe -= 3;
                     }
-
-
                 }
                 rocket.superado = true;
             }
